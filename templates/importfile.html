@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Import File
+{% endblock %}
+
+{% block main %}
+    <form action="/importfile" enctype='multipart/form-data' method="post">
+        <div class="mb-3">
+            <label for="file">Select a file: </label>
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="file" name="file" type="file">
+        </div>
+        <br><br>
+        <button class="btn btn-primary" type="submit">Submit</button>
+    </form>
+{% endblock %}

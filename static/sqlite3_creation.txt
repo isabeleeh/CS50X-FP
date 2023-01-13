@@ -1,0 +1,14 @@
+CREATE TABLE herbs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    Chinese_ch TEXT NOT NULL,
+    pinyin TEXT NOT NULL,
+    amount NUMERIC NOT NULL DEFAULT 100,
+    priority TEXT CHECK(priority IN('minor', 'normal', 'major')) NOT NULL);
+
+CREATE TABLE price(
+    id INTEGER NOT NULL,
+    retail NUMERIC,
+    bulk NUMERIC,
+    store TEXT NOT NULL,
+    FOREIGN KEY(id) REFERENCES herbs(id)
+);

@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Index
+{% endblock %}
+
+{% block main %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th class="text-start">Chinese Name</th>
+                <th class="text-start">Pin Yin</th>
+                <th class="text-center">Amount(g)</th>
+                <th class="text-center" colspan="3">Operation</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if rows %}
+                {% for row in rows %}
+                    <tr>
+                        <td class="text-start">{{ row.Chinese_ch }}</td>
+                        <td class="text-start">{{ row.pinyin }}</td>
+                        <td class="text-center">{{ row.amount }}</td>
+                        <form action="addorminus" method="post"></form>
+                            <td class="text-center">
+                                                                                    
+                                <div class="mb-3">
+                                    <SELECT class="form-select w-50" name="operation">
+                                        <option value="ADD">ADD</option>
+                                        <option value="MINUS">MINUS</option>
+                                    </SELECT>
+                                </div> 
+                            </td>
+                            <td>
+                                <div class="mb-3">
+                                    <input class="form-control w-25" min="0" id="quantity" name="quantity" placeholder="g" type="number">
+                                </div>
+                            </td>
+                                <input name="id" type="hidden" value="{{ row.id }}">
+                            <td>
+                                <input class="btn btn-primary" type="submit" value="Submit">
+                            </td>
+                        </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+        <tfoot>
+            
+        </tfoot>
+        </tbody>
+    </table>
+{% endblock %}
