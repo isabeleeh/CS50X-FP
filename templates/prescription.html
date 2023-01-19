@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Prescription
+{% endblock %}
+
+{% block main %}
+    {% if invalid_herbs %}    
+        <div class="mb-3">
+            {% for item in invalid_herbs %}
+                <p>{{ item.Chinese_ch }}: {{ item.amount }}</p>
+            {% endfor %}
+            <p>Those herbs are not in database.</p>
+        </div>
+    {% elif insufficient_herbs %}
+        <div class="mb-3">
+            {% for item in insufficient_herbs %}
+                <p>{{ item.Chinese_ch }}: {{ item.amount }}</p>
+            {% endfor %}
+            <p>Those herbs are not sufficient.</p>
+        </div>
+    {% else %}
+
+        <form action="/prescription" method="post">
+            <div class="mb-3">
+                <textarea autocomplete="off" autofocus class="form-control mx-auto w-auto" id="prescript" name="prescript" rows="8" cols="60"></textarea>
+            </div>
+            <div class="mb-3">
+                <input class="form-control mx-auto w-auto" id="doses" min="1" name="doses" value="3" type="number">
+            </div>
+            <button class="btn btn-primary" type="submit">Submit</button>
+        </form>
+    {% endif %}
+{% endblock %}

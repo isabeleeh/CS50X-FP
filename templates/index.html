@@ -21,25 +21,20 @@
                         <td class="text-start">{{ row.Chinese_ch }}</td>
                         <td class="text-start">{{ row.pinyin }}</td>
                         <td class="text-center">{{ row.amount }}</td>
-                        <form action="addorminus" method="post"></form>
-                            <td class="text-center">
-                                                                                    
+                        <form action="manage" method="post">
+                          
+                            <td class="text-start">
+                                <div class="mb-3 ">                                   
+                                    <input class="form-control w-50" id="quantity" name="quantity" placeholder="g" type="number" data-toggle="tooltip" data-placement="bottom" title="Use positive number to indicate ADD while negative number to indicate MINUS.">
+                                </div>
                                 <div class="mb-3">
-                                    <SELECT class="form-select w-50" name="operation">
-                                        <option value="ADD">ADD</option>
-                                        <option value="MINUS">MINUS</option>
-                                    </SELECT>
-                                </div> 
-                            </td>
-                            <td>
-                                <div class="mb-3">
-                                    <input class="form-control w-25" min="0" id="quantity" name="quantity" placeholder="g" type="number">
+                                    <input name="id" type="hidden" value="{{ row.id }}">
                                 </div>
                             </td>
-                                <input name="id" type="hidden" value="{{ row.id }}">
-                            <td>
-                                <input class="btn btn-primary" type="submit" value="Submit">
+                            <td class="test-start">
+                                <input class="btn btn-primary" type="submit" value="Change">
                             </td>
+
                         </form>
                         </td>
                     </tr>
