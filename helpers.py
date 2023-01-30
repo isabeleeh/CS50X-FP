@@ -64,4 +64,10 @@ def split_herbs(prescript):
             chinese = ''
             chinese = chinese.join(re.findall('[\u4e00-\u9fa5]', tmp)) 
             item_list.append({'Chinese_ch': chinese, 'amount': amount})
-    return item_list   
+    return item_list
+
+def is_all_chinese(strs):
+    for _char in strs:
+        if not '\u4e00' <= _char <= '\u9fa5':
+            return False
+    return True   

@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Replenish Herbs One By One
+{% endblock %}
+
+{% block main %}
+    <form action="/replenish" enctype='multipart/form-data' method="post">
+        {% if not add_others %}
+            <div class="mb-3">
+                <SELECT class="form-select mx-auto w-auto" name="herb">
+                    <option disabled selected>Herbs</option>
+                    {% for herb in herbs %}
+                        <option value="{{ herb.Chinese_ch }}">{{ herb.Chinese_ch }}</option>
+                    {% endfor %}
+                    <option>Add Others</option>
+                </SELECT>               
+            </div>
+            <div class="mb-3">
+                <input class="form-control mx-auto w-auto" id="amount" name="amount" placeholder="600" type="number">克
+                <input name="addothers" type="hidden" value="false">
+            </div>
+        {% else %}
+            <div class="mb-3">
+                <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="newherb" name="newherb" placeholder="New herb" type="text">
+                <input name="addothers" type="hidden" value="true">
+            </div>
+            <div class="mb-3">
+                <input class="form-control mx-auto w-auto" id="shares" min="1" name="amount" placeholder="600" type="number">
+            </div>
+        {% endif %}
+        <br>
+        <button class="btn btn-primary" type="submit">Replenish</button>
+
+    </form>
+{% endblock %}

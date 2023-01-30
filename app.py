@@ -1,11 +1,10 @@
-import os, time, csv, re, logging
+import os, time, csv, re, logging, pinyin
 
 from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request
 from werkzeug.utils import secure_filename
-from pypinyin import lazy_pinyin
 
-from helpers import apology, allowed_file, split_herbs
+from helpers import apology, allowed_file, split_herbs, is_all_chinese
 
 UPLOAD_FOLDER = './uploads'
 
@@ -58,7 +57,7 @@ def importfile():
             return redirect("/")
             
         if file and allowed_file(file.filename):
-            filename = secure_filename(''.join(lazy_pinyin(file.filename)))
+            filename = secure_filename(''.pinyin.get(file.filename, format = "strip"))
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
             # return redirect(url_for('uploaded_file', filename=filename))
@@ -121,7 +120,7 @@ def prescription():
         invalid_herbs = []
         # To store the herbs that have no adequet amount in db
         insufficient_herbs = []
-        
+
         for herb in herbs_list:            
             item_db = db.execute("SELECT * FROM herbs WHERE Chinese_ch = ?", herb["Chinese_ch"])
             # If cannot find the corresponding herb in db
@@ -156,7 +155,7 @@ def manage():
         amount = request.form.get("quantity")
         item_id = request.form.get("id")
         if not amount:
-            apology("The amount cannot be blank")
+            return apology("The amount cannot be blank")
         amount = int(amount)
         item_db = db.execute("SELECT * FROM herbs WHERE id = ?", item_id)
         if (item_db[0]["amount"] + amount) < 0:
@@ -168,11 +167,62 @@ def manage():
         flash("Succeeded!")
         return redirect("/")
 
-@app.route("/testonly", methods = ["GET", "POST"])
-def testonly():
+
+@app.route("/replenish", methods = ["GET", "POST"])
+def replenish():
+    # Replenish one by one
     if request.method == "POST":
-        # SUDO
-        i = request.form.get("id")
-    else:
+        # To show the existing herbs listed from db for users to edit amount
+        # To indicate whether it is add amount for existing herb or add new herb
+        add_others = request.form.get("addothers")
+        if add_others == 'false':
+
+            herb = request.form.get("herb")
+            amount = request.form.get("amount")
+
+            # To add new herb that does not exist in db yet
+            if herb == "Add Others":
+                add_others = True
+                return render_template("replenish.html", add_others = add_others)
+
+            if not herb or not amount:
+                return apology("Herb or amount cannot be blank")
+
+            item_db = db.execute("SELECT * FROM herbs WHERE Chinese_ch = ?", herb)
+            amount_db = item_db[0]["amount"]
+
+            # - means minus. So there is the possibility for user to input a bigger amount number to minus than the existing amount
+            if (amount_db + int(amount)) < 0:
+                return apology("No sufficient amount")
+
+            # Update the amount into db
+            db.execute("UPDATE herbs SET amount = ? WHERE Chinese_ch = ?", amount_db + int(amount), herb)
+            flash("Added Successfully!")
         
-        return render_template("test.html")
+        # To handle adding new herb
+        elif add_others == 'true':
+            new_herb = request.form.get("newherb")
+            amount = request.form.get("amount")
+            if not new_herb or not amount:
+                return apology("Herb or amount cannot be blank")
+
+            if not is_all_chinese(new_herb):
+                return apology("Please input Chinese name of the herb")
+
+            amount = int(amount)
+            pinyin_herb = (pinyin.get(new_herb, format='strip', delimiter=" ")).title()
+
+            item_db = db.execute("SELECT * FROM herbs WHERE Chinese_ch = ?", new_herb)
+            if item_db:
+                return apology("The herb exists!")
+                
+            db.execute("INSERT INTO herbs (Chinese_ch, pinyin, amount) VALUES (?, ?, ?)",
+                new_herb,
+                pinyin_herb,
+                amount)
+            flash("Added Successfully!")
+            
+        return redirect("/replenish")
+    else:
+        herbs = db.execute("SELECT * FROM herbs ORDER BY pinyin")
+        return render_template("replenish.html", herbs = herbs)
