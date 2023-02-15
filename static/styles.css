@@ -21,3 +21,11 @@ nav .navbar-brand .green
 {
     color: #2e944b;
 }
+.tooltip-inner {
+    background-color: #757c88;
+    box-shadow: 0px 0px 4px black;
+    opacity: 1 !important;
+}
+.tooltip.bs-tooltip-top .tooltip-arrow::before {
+    border-top-color: #757c88 !important;
+}

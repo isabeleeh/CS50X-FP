@@ -20,7 +20,11 @@
     </head>
 
     <body>
-
+        <script>
+            $(document).ready(function() {
+                $('input').tooltip();
+            });
+        </script>
         <nav class="bg-light border navbar navbar-expand-md navbar-light">
             <div class="container-fluid">
                 <a class="navbar-brand" href="/"><span class="blue">H</span><span class="red">E</span><span class="yellow">R</span><span class="green">B</span><span class="red">S</span></a>
@@ -32,9 +36,15 @@
                             <li class="nav-item"><a class="nav-link" href="/prescription">Prescription</a></li>
                             <li class="nav-item"><a class="nav-link" href="/replenish">Bulk Replenish</a></li>
                             <li class="nav-item"><a class="nav-link" href="/importfile">Import Herbs</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/export">Export Herbs</a></li> 
-                            <li class="nav-item"><a class="nav-link" href="/testonly">Test Only</a></li>                                                  
+                            
                         </ul>
+                        <form class="nav-item ms-auto mt-2" action="/export" enctype='multipart/form-data' method="post">
+                            <button class="btn" type="submit">Export Herbs</button>
+                        </form>
+                        <form class="nav-item ms-0 mt-2" action="/removeall" onclick="return confirm('Are you sure?')" enctype='multipart/form-data' method="post">
+                            <button class="btn" type="submit">Remove All</button>
+                        </form>
+                        
                 </div>
             </div>
         </nav>

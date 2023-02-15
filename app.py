@@ -1,10 +1,13 @@
-import os, time, csv, re, logging, pinyin
+import os, csv, re, pinyin as py
 
 from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request
 from werkzeug.utils import secure_filename
+from werkzeug.wrappers import Response
+from io import StringIO
 
-from helpers import apology, allowed_file, split_herbs, is_all_chinese
+
+from helpers import apology, allowed_file, split_herbs, is_all_chinese, generate_download_headers
 
 UPLOAD_FOLDER = './uploads'
 
@@ -34,10 +37,7 @@ def index():
     """Show portfolio of all herbs"""
     rows = db.execute("SELECT * FROM herbs ORDER BY pinyin")
 
-    if rows:
-        return render_template("index.html", rows=rows)
-    else:
-        return apology("Error when accessing database")
+    return render_template("index.html", rows=rows)
 
 
 @app.route("/importfile", methods = ["GET", "POST"])
@@ -57,7 +57,7 @@ def importfile():
             return redirect("/")
             
         if file and allowed_file(file.filename):
-            filename = secure_filename(''.pinyin.get(file.filename, format = "strip"))
+            filename = secure_filename(py.get(file.filename, format = "strip"))
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
             # return redirect(url_for('uploaded_file', filename=filename))
@@ -68,8 +68,9 @@ def importfile():
                 reader = csv.DictReader(csv_file)
                 for row in reader:
                     
+                    # In case the "Amount" field is blank
                     if row["Amount"] == '':
-                        amount = 100;
+                        amount = 0;
                     else:
                         amount = int(row["Amount"])
                     mixedname = row["Name"]
@@ -140,7 +141,7 @@ def prescription():
             # Show the listed herbs that have not been handled
             return render_template("prescription.html", invalid_herbs = invalid_herbs, insufficient_herbs = insufficient_herbs)
 
-        #flash("Succeeded!")
+        flash("Succeeded!")
         
 
     else:
@@ -157,12 +158,12 @@ def manage():
         if not amount:
             return apology("The amount cannot be blank")
         amount = int(amount)
-        item_db = db.execute("SELECT * FROM herbs WHERE id = ?", item_id)
-        if (item_db[0]["amount"] + amount) < 0:
-            flash("Insufficient amount!")
-            return redirect("/")
+        # item_db = db.execute("SELECT * FROM herbs WHERE id = ?", item_id)
+        #if (item_db[0]["amount"] + amount) < 0:
+        #    flash("Insufficient amount!")
+        #    return redirect("/")
         
-        db.execute("UPDATE herbs SET amount = ? WHERE id = ?", (item_db[0]["amount"] + amount), item_id)
+        db.execute("UPDATE herbs SET amount = ? WHERE id = ?", (amount), item_id)
 
         flash("Succeeded!")
         return redirect("/")
@@ -210,7 +211,7 @@ def replenish():
                 return apology("Please input Chinese name of the herb")
 
             amount = int(amount)
-            pinyin_herb = (pinyin.get(new_herb, format='strip', delimiter=" ")).title()
+            pinyin_herb = (py.get(new_herb, format='strip', delimiter=" ")).title()
 
             item_db = db.execute("SELECT * FROM herbs WHERE Chinese_ch = ?", new_herb)
             if item_db:
@@ -226,3 +227,58 @@ def replenish():
     else:
         herbs = db.execute("SELECT * FROM herbs ORDER BY pinyin")
         return render_template("replenish.html", herbs = herbs)
+
+@app.route("/remove", methods = ["GET", "POST"])
+def remove():
+    if request.method == "POST":
+        id = request.form.get("id")
+        if id:
+            db.execute("DELETE FROM herbs WHERE id = ?", id)
+            flash("Successfully removed!")
+        
+        return redirect("/")
+    
+@app.route("/export", methods = ["POST"])
+def export():
+    def generate():
+        # place holder for path
+        os_path = ''
+        db_row = db.execute("SELECT * FROM herbs ORDER BY pinyin")
+        
+        # Use StringIO to write into memory instead of creating actual file
+        data = StringIO()
+        # Specify field names because I do not need all the fields in db to be reflected in csv file
+        fieldnames = ['Name', 'Amount']
+        # According to python docs usage example of csv.DictWriter
+        w = csv.DictWriter(data, fieldnames=fieldnames)
+
+        w.writeheader()
+        # To save memory: 返回写入的值，然后让io流指针回到起点，删去指针后的部分，即清空所有写入的内容，准备下一行的写入
+        yield data.getvalue()
+        data.seek(0)
+        data.truncate(0)
+
+        # write each line item
+        for item in db_row:
+            # Here use three variables to avoid ' or " conflicts 
+            chinese_ch = item["Chinese_ch"]
+            pinyin = item["pinyin"]
+            name = f"{chinese_ch} {pinyin}"
+            w.writerow(
+                {'Name': name,
+                    'Amount': item["amount"]}
+                )
+            yield data.getvalue()
+            data.seek(0)
+            data.truncate(0)
+    if request.method == "POST":
+        # Export/download file from server
+        return Response(generate(), 
+                        headers = generate_download_headers("csv"),
+                        mimetype = "text/csv",
+                        )
+@app.route("/removeall", methods = ["POST"])
+def removeall():
+    db.execute("DELETE FROM herbs")
+    flash("Remove All Herbs!")
+    return redirect("/")

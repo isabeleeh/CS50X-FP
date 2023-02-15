@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Export CSV File
+{% endblock %}
+
+{% block main %}
+    <form action="/export" enctype='multipart/form-data' method="post">
+        <br><br>
+        <button class="btn btn-primary" type="submit">Submit</button>
+    </form>
+{% endblock %}
