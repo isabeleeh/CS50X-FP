@@ -1,7 +1,7 @@
 # HERBS INVENTORY MANAGEMENT
-#### Video Demo:  <URL HERE>
+#### Video Demo:  <https://youtu.be/h35MLJ12Xac>
 #### Description:
-This project is based on the daily requirements of myself. As people who are under Chinese medicine conditioning, instead of manually check out our herbs inventory, we are anxious to build up such a system that can record each herb's remaining amount, automatically read doctor's prescription and minus the amount from inventory, replenish, as well as some other basic operations to the data. It is a web-based application using JavaScript, Python, and SQL. Part of the style inherits one of CS50X Problem Set *Finance* (hereinafter called *Finance*).
+This project is based on the daily requirements of myself. As people who are under Chinese medicine conditioning, instead of manually check out our herbs inventory, we are anxious to build up such a system that can record each herb's remaining amount, automatically read doctor's prescription and minus the amount from inventory, replenish, as well as some other basic operations to the data. It is a web-based application using JavaScript, Python, and SQL. Part of the style inherits one of CS50X Problem Sets *Finance* (hereinafter called *Finance*).
 
 #### Requirements:
 1. By default, the homepage will display all the herbs recorded in database, ordered by Chinese pinyin. 
