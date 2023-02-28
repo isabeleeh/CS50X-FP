@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 
 
 ALLOWED_EXTENSIONS = {'csv'}
-EASILY_COMBINDED = {'生龙骨', '生牡蛎', '煅龙骨', '煅牡蛎', '石决明', '赤芍', '生白芍', '炒神曲', '炒麦芽', '炒山楂'}
+EASILY_COMBINDED = {'生龙骨', '生牡蛎', '煅龙骨', '煅牡蛎', '石决明', '赤芍', '生白芍', '炒神曲', '炒麦芽', '炒山楂', '熟地黄', '生地黄'}
 
 
 """apology function herits that of CS50X Problem Set 9, Finance
@@ -43,6 +43,7 @@ def preprocess(text):
         tmp = tmp.replace("牡蛎", "生牡蛎")
     if ("赤白芍" in text):
         tmp = tmp.replace("赤白芍", "赤芍生白芍")
+        return tmp
     if ("焦三仙" in text) or ("炒三仙" in text):
         tmp = tmp.replace("焦三仙", "炒麦芽炒神曲炒山楂")
         tmp = tmp.replace("炒三仙", "炒麦芽炒神曲炒山楂")
@@ -50,7 +51,9 @@ def preprocess(text):
         tmp = tmp.replace("生地", "生地黄")
     if ("熟地" in text) and ("熟地黄" not in text):
         tmp = tmp.replace("熟地", "熟地黄")
-        return tmp
+    if ("白芍" in text) and ("生白芍" not in text) and ("炒白芍" not in text):
+        tmp = tmp.replace("白芍", "生白芍")
+    return tmp
 
 def split_herbs(prescript):
     # To take the whole prescription as input, and return a dict type with herb name and amount.
@@ -64,11 +67,11 @@ def split_herbs(prescript):
             amount = int(amount)
         else:
             continue
-
+        tmp = preprocess(tmp)
         if '各' in tmp:
             # like "生龙骨煅牡蛎各30"
-            tmp = re.split(r"各", item)[0] # "生龙骨煅牡蛎各30" -> "生龙骨煅牡蛎"
-            tmp = preprocess(tmp)
+            tmp = re.split(r"各", tmp)[0] # "生龙骨煅牡蛎各30" -> "生龙骨煅牡蛎"
+
             for chinese in EASILY_COMBINDED:
                 if tmp == "":
                     break
@@ -77,10 +80,8 @@ def split_herbs(prescript):
                     tmp = tmp.replace(chinese, '')
 
         else:
-            
             # Catch the herb's Chinese name
-            chinese = ''
-            chinese = chinese.join(re.findall('[\u4e00-\u9fa5]', tmp)) 
+            chinese = ''.join(re.findall('[\u4e00-\u9fa5]', tmp)) 
             item_list.append({'Chinese_ch': chinese, 'amount': amount})
     return item_list
 

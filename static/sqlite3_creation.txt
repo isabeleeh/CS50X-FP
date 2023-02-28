@@ -12,3 +12,8 @@ CREATE TABLE price(
     store TEXT NOT NULL,
     FOREIGN KEY(id) REFERENCES herbs(id)
 );
+
+CREATE TABLE prescriptions(
+id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+name TEXT NOT NULL,
+prescription TEXT NOT NULL);

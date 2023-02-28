@@ -29,3 +29,22 @@ nav .navbar-brand .green
 .tooltip.bs-tooltip-top .tooltip-arrow::before {
     border-top-color: #757c88 !important;
 }
+#myBtn {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 90px;
+    z-index: 99;
+    font-size: 15px;
+    border: none;
+    outline: none;
+    background-color: rgba(0, 47, 255, 0.328);
+    color: white;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 3px;
+  }
+  
+  #myBtn:hover {
+    background-color: rgba(0, 47, 255, 0.616);
+  }

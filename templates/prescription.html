@@ -19,16 +19,32 @@
             {% endfor %}
             <p>Those herbs are not sufficient.</p>
         </div>
+    {% elif replenish_herbs %}
+        <div class="mb-3">
+            {% for item in replenish_herbs %}
+                <p>{{ item.Chinese_ch }}: {{ item.amount }}</p>
+            {% endfor %}
+            <p>Those herbs are to be replenished.</p>
+        </div>
     {% else %}
 
         <form action="/prescription" method="post">
-            <div class="mb-3">
-                <textarea autocomplete="off" autofocus class="form-control mx-auto w-auto" id="prescript" name="prescript" rows="8" cols="60"></textarea>
-            </div>
+            {% if existing_pres %}
+                <div class="mb-3">
+                    <textarea autocomplete="off" autofocus class="form-control mx-auto w-auto" id="prescript" name="prescript" value="test" rows="8" cols="60">{{ existing_pres }}</textarea>
+                </div>
+            {% else %}
+                <div class="mb-3">
+                    <textarea autocomplete="off" autofocus class="form-control mx-auto w-auto" id="prescript" name="prescript" rows="8" cols="60"></textarea>
+                </div>
+            {% endif %}
+
             <div class="mb-3">
                 <input class="form-control mx-auto w-auto" id="doses" min="1" name="doses" value="3" type="number">
             </div>
             <button class="btn btn-primary" type="submit">Submit</button>
+
         </form>
+
     {% endif %}
 {% endblock %}

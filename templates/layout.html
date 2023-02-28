@@ -36,7 +36,7 @@
                             <li class="nav-item"><a class="nav-link" href="/prescription">Prescription</a></li>
                             <li class="nav-item"><a class="nav-link" href="/replenish">Bulk Replenish</a></li>
                             <li class="nav-item"><a class="nav-link" href="/importfile">Import Herbs</a></li>
-                            
+                            <li class="nav-item"><a class="nav-link" href="/add_prescription">Daily Pres</a></li>
                         </ul>
                         <form class="nav-item ms-auto mt-2" action="/export" enctype='multipart/form-data' method="post">
                             <button class="btn" type="submit">Export Herbs</button>
@@ -64,6 +64,14 @@
         <footer class="mb-5 small text-center text-muted">
             Isabel's First Project
         </footer>
+
+    <script>
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+
+    </script>
 
     </body>
 

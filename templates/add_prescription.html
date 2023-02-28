@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Daily Prescription
+{% endblock %}
+
+{% block main %}
+    <form action="/add_prescription" enctype='multipart/form-data' method="post">
+        {% if not add_others %}
+            <div class="mb-3">
+                <SELECT class="form-select mx-auto w-auto" name="existing_pres">
+                    <option disabled selected>方剂</option>
+                    {% if existing_prscrpt %}
+                        {% for item in existing_prscrpt %}
+                            <option value="{{ item.name }}">{{ item.name }}</option>
+                        {% endfor %}
+                    {% endif %}
+                    <option>其他</option>
+                </SELECT>               
+            </div>
+            <div class="mb-3">
+                <input name="addothers" type="hidden" value="false">
+            </div>
+        {% else %}
+            <div class="mb-3">
+                <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="newname" name="newname" placeholder="方剂名" type="text">
+                <br>
+                <textarea autocomplete="off" autofocus class="form-control mx-auto w-auto" id="new_prescript" name="new_prescript" rows="8" cols="60"></textarea>                <input name="addothers" type="hidden" value="true">
+            </div>
+            
+        {% endif %}
+        <br>
+        <button class="btn btn-primary" type="submit">Add</button>
+
+    </form>
+{% endblock %}

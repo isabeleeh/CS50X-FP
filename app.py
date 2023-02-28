@@ -9,7 +9,7 @@ from io import StringIO
 
 from helpers import apology, allowed_file, split_herbs, is_all_chinese, generate_download_headers
 
-UPLOAD_FOLDER = './uploads'
+UPLOAD_FOLDER = './static'
 
 # Configure application
 app = Flask(__name__)
@@ -121,6 +121,8 @@ def prescription():
         invalid_herbs = []
         # To store the herbs that have no adequet amount in db
         insufficient_herbs = []
+        # To store the herbs that need to replenish: 当次的药材里面剩余的量少于三副的
+        replenish_herbs = []
 
         for herb in herbs_list:            
             item_db = db.execute("SELECT * FROM herbs WHERE Chinese_ch = ?", herb["Chinese_ch"])
@@ -135,11 +137,17 @@ def prescription():
                 insufficient_herbs.append(herb)
                 continue
 
+            if (amount_db - herb["amount"] * doses * 2) < 0:
+                replenish_herbs.append(herb)
+
             db.execute("UPDATE herbs SET amount = ? WHERE Chinese_ch = ?", (amount_db - herb["amount"] * doses), herb["Chinese_ch"])
 
-        if invalid_herbs or insufficient_herbs:
+        if invalid_herbs or insufficient_herbs or replenish_herbs:
             # Show the listed herbs that have not been handled
-            return render_template("prescription.html", invalid_herbs = invalid_herbs, insufficient_herbs = insufficient_herbs)
+            return render_template("prescription.html", 
+                                   invalid_herbs = invalid_herbs, 
+                                   insufficient_herbs = insufficient_herbs, 
+                                   replenish_herbs = replenish_herbs)
 
         flash("Succeeded!")
         
@@ -263,7 +271,7 @@ def export():
             # Here use three variables to avoid ' or " conflicts 
             chinese_ch = item["Chinese_ch"]
             pinyin = item["pinyin"]
-            name = f"{chinese_ch} {pinyin}"
+            name = f"{pinyin} {chinese_ch}"
             w.writerow(
                 {'Name': name,
                     'Amount': item["amount"]}
@@ -282,3 +290,30 @@ def removeall():
     db.execute("DELETE FROM herbs")
     flash("Remove All Herbs!")
     return redirect("/")
+
+@app.route("/add_prescription", methods = ["POST", "GET"])
+def add_prescription():
+    if request.method == "POST":
+        add_others = request.form.get("addothers")
+        if add_others == 'false':
+            existing_pres = request.form.get("existing_pres")
+            if not existing_pres:
+                return apology("Prescription cannot be blank")
+            
+            if existing_pres == "其他":
+                add_others = True
+                return render_template("add_prescription.html", add_others = add_others)
+            
+            item_db = db.execute("SELECT * FROM prescriptions WHERE name = ?", existing_pres)
+            return render_template("prescription.html", existing_pres = item_db[0]["prescription"])
+        else:
+            newname = request.form.get("newname")
+            new_prescript = request.form.get("new_prescript")
+            if not newname or not new_prescript:
+                return apology("Name or Prescription cannot be blank")
+            db.execute("INSERT INTO prescriptions (name, prescription) VALUES (?, ?)", newname, new_prescript)
+            flash("Added Successfully!")
+        return redirect("/add_prescription")
+    else:
+        existing_prscrpt = db.execute("SELECT * FROM prescriptions ORDER BY name")
+        return render_template("add_prescription.html", existing_prscrpt = existing_prscrpt)
