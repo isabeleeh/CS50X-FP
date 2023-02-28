@@ -20,7 +20,9 @@ This project is based on the daily requirements of myself. As people who are und
 
 5. The project will allow users to export one .csv file to local computer. Currently only 'Name' and 'Amount' fields are provided.
 
-6. Please be noted that above is just phase I requirements. Moving forward, more feaures might be added, such as replenish price record, usage record, herbs usage trending analysis, etc.
+6. The project will allow users to add some daily/routine prescriptions such as 生脉散 so that users do not need to type them in the 'Prescription' field manually.
+
+7. Please be noted that above is just phase I requirements. Moving forward, more feaures might be added, such as replenish price record, usage record, herbs usage trending analysis, etc.
 
 #### Files Usage And Explaination:
 1. Python files
@@ -44,6 +46,8 @@ This project is based on the daily requirements of myself. As people who are und
      - 'removeall': allows users to remove all herbs from database.
 
      - 'export': allows users to export data to local disk. Currently only two fields will be shown being 'Name' and 'Amount'. 
+
+     - 'add_prescription': allows users to insert some daily routine prescriptions so that no mannually typing is needed.
 
    - 'helpers.py': defines some internally invoked functions.
    
